@@ -1,0 +1,10 @@
+# Normalize line endings: LF in the repo, native on checkout.
+* text=auto
+
+*.cs      text diff=csharp
+*.csproj  text
+*.sln     text eol=crlf
+*.json    text
+*.config  text
+*.md      text
+*.yml     text

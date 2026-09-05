@@ -1,0 +1,22 @@
+# Local PostgreSQL for development. Start it with:  docker compose up -d
+# Stop and wipe:  docker compose down -v
+services:
+  db:
+    image: postgres:16
+    container_name: gym-postgres
+    environment:
+      POSTGRES_DB: gymdb
+      POSTGRES_USER: gym
+      POSTGRES_PASSWORD: gym_local_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - gym-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gym -d gymdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  gym-pgdata:

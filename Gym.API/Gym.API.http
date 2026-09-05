@@ -1,0 +1,67 @@
+@host = https://localhost:7056
+
+### Login as a member (Dana)
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "dana@gym.local", "password": "Member#123" }
+
+### Capture the token from the login response
+@token = {{login.response.body.accessToken}}
+
+### Login as a second member (Noa) for the race
+# @name login2
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "noa@gym.local", "password": "Member#123" }
+
+@token2 = {{login2.response.body.accessToken}}
+
+### Browse upcoming sessions (paged, only ones with room)
+GET {{host}}/api/classsessions?page=1&pageSize=10&onlyAvailable=true&sortBy=startsAt
+Authorization: Bearer {{token}}
+
+### The seeded near-full Spin session is id 1 (capacity 3, 2 booked).
+### Fire the next two requests as close together as possible:
+### one returns 201, the other 409 Conflict.
+POST {{host}}/api/bookings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "classSessionId": 1 }
+
+###
+POST {{host}}/api/bookings
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+{ "classSessionId": 1 }
+
+### My bookings
+GET {{host}}/api/bookings/mine
+Authorization: Bearer {{token}}
+
+### Admin login
+# @name admin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "admin@gym.local", "password": "Admin#123" }
+
+@adminToken = {{admin.response.body.accessToken}}
+
+### Admin creates a new session
+POST {{host}}/api/classsessions
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "classTypeId": 1, "instructorId": 1, "startsAtUtc": "2026-12-01T18:00:00Z", "capacity": 2 }
+
+### A member cannot create a session -> 403
+POST {{host}}/api/classsessions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "classTypeId": 1, "instructorId": 1, "startsAtUtc": "2026-12-01T18:00:00Z" }
