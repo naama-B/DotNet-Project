@@ -24,6 +24,3 @@ secrets.json
 # OS
 Thumbs.db
 .DS_Store
-
-# Leftover Web API scaffold that predates the layered solution (kept only until Visual Studio releases the lock)
-/project/
