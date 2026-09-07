@@ -77,14 +77,29 @@ Cross-cutting pieces:
 ### Prerequisites
 
 * .NET SDK 9.0
-* **PostgreSQL** — the connection string points at a Postgres database. The quickest way is
-  Docker:
+* **PostgreSQL** — the connection string points at a Postgres database on `localhost:5432`.
+  Pick one:
+
+  **Option A — Docker (quickest):**
 
   ```bash
   docker compose up -d      # starts postgres:16 on localhost:5432 (db=gymdb user=gym pass=gym_local_dev)
   ```
 
-  Any other Postgres works too; just adjust the connection string below.
+  **Option B — a locally installed PostgreSQL (no Docker):**
+
+  Install PostgreSQL (16 or newer) — on Windows: `winget install PostgreSQL.PostgreSQL.17`,
+  which registers an auto-starting service on port 5432 with a `postgres` superuser. Then
+  create the database and login this project expects (run from
+  `C:\Program Files\PostgreSQL\17\bin`, or with `psql` on PATH):
+
+  ```bash
+  psql -U postgres -c "CREATE ROLE gym LOGIN PASSWORD 'gym_local_dev';"
+  psql -U postgres -c "CREATE DATABASE gymdb OWNER gym;"
+  ```
+
+  Any other Postgres works too; just adjust the connection string below. The app creates its
+  own tables (migrations run on startup) — you only need the empty `gymdb` database to exist.
 
 ### 1. Configure secrets (not committed)
 
