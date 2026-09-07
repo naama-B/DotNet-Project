@@ -71,8 +71,14 @@ try
         app.UseSwagger();
         app.UseSwaggerUI();
     }
+    else
+    {
+        // In development the API is reached through the Vite dev proxy over plain HTTP;
+        // an HTTPS redirect there answers authenticated calls with a 307 whose target is a
+        // different origin, and the browser drops the Authorization header when it follows it.
+        app.UseHttpsRedirection();
+    }
 
-    app.UseHttpsRedirection();
     app.UseCors("client");
     app.UseAuthentication();
     app.UseAuthorization();
