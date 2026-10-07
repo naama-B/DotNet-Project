@@ -165,6 +165,19 @@ public sealed class BookingService : IBookingService
     public async Task<IReadOnlyList<BookingResponse>> ListForMemberAsync(int memberId, CancellationToken ct = default)
     {
         var bookings = await _bookings.ListForMemberAsync(memberId, ct);
-        return _mapper.Map<IReadOnlyList<BookingResponse>>(bookings);
+        var mapped = _mapper.Map<IReadOnlyList<BookingResponse>>(bookings);
+
+        // The Booking row does not carry a queue position; it lives on the WaitlistEntry.
+        var positions = await _bookings.GetWaitlistPositionsForMemberAsync(memberId, ct);
+        foreach (var booking in mapped)
+        {
+            if (booking.Status == nameof(BookingStatus.Waitlisted)
+                && positions.TryGetValue(booking.ClassSessionId, out var position))
+            {
+                booking.WaitlistPosition = position;
+            }
+        }
+
+        return mapped;
     }
 }

@@ -14,6 +14,12 @@ public sealed class ClassSessionResponse
     public int BookedCount { get; set; }
     public int AvailableSpots { get; set; }
     public string Status { get; set; } = default!;
+
+    /// <summary>Number of satisfaction ratings members have left for this session.</summary>
+    public int RatingCount { get; set; }
+
+    /// <summary>Mean star rating (1–5), rounded to two places; null until the session has been rated.</summary>
+    public double? AverageStars { get; set; }
 }
 
 public sealed class CreateClassSessionRequest

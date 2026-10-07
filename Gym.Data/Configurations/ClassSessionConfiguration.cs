@@ -62,3 +62,29 @@ public sealed class WaitlistEntryConfiguration : IEntityTypeConfiguration<Waitli
         builder.HasIndex(w => new { w.ClassSessionId, w.MemberId }).IsUnique();
     }
 }
+
+public sealed class ClassRatingConfiguration : IEntityTypeConfiguration<ClassRating>
+{
+    public void Configure(EntityTypeBuilder<ClassRating> builder)
+    {
+        builder.HasKey(r => r.Id);
+        builder.Property(r => r.Stars).IsRequired();
+        builder.Property(r => r.Comment).HasMaxLength(1000);
+        builder.Property(r => r.CreatedAtUtc).IsRequired();
+
+        // At most one rating per member per session; POST updates the existing row.
+        builder.HasIndex(r => new { r.ClassSessionId, r.MemberId }).IsUnique();
+
+        builder.HasOne(r => r.ClassSession)
+            .WithMany(s => s.Ratings)
+            .HasForeignKey(r => r.ClassSessionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(r => r.Member)
+            .WithMany(m => m.Ratings)
+            .HasForeignKey(r => r.MemberId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.ToTable(t => t.HasCheckConstraint("CK_ClassRatings_Stars", "\"Stars\" BETWEEN 1 AND 5"));
+    }
+}

@@ -45,6 +45,12 @@ public sealed class BookingRepository : Repository<Booking>, IBookingRepository
         Db.WaitlistEntries.FirstOrDefaultAsync(
             w => w.ClassSessionId == classSessionId && w.MemberId == memberId, ct);
 
+    public async Task<IReadOnlyDictionary<int, int>> GetWaitlistPositionsForMemberAsync(int memberId, CancellationToken ct = default) =>
+        await Db.WaitlistEntries
+            .AsNoTracking()
+            .Where(w => w.MemberId == memberId)
+            .ToDictionaryAsync(w => w.ClassSessionId, w => w.Position, ct);
+
     public void RemoveWaitlistEntry(WaitlistEntry entry) => Db.WaitlistEntries.Remove(entry);
 
     public async Task AddWaitlistEntryAsync(WaitlistEntry entry, CancellationToken ct = default) =>

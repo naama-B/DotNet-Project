@@ -18,7 +18,10 @@ public sealed class MappingProfile : Profile
             .ForMember(d => d.InstructorName, o => o.MapFrom(s => s.Instructor.FullName))
             .ForMember(d => d.DurationMinutes, o => o.MapFrom(s => s.ClassType.DurationMinutes))
             .ForMember(d => d.AvailableSpots, o => o.MapFrom(s => s.Capacity - s.BookedCount > 0 ? s.Capacity - s.BookedCount : 0))
-            .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()));
+            .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()))
+            .ForMember(d => d.RatingCount, o => o.MapFrom(s => s.Ratings.Count))
+            .ForMember(d => d.AverageStars, o => o.MapFrom(s =>
+                s.Ratings.Count > 0 ? (double?)Math.Round(s.Ratings.Average(r => r.Stars), 2) : null));
 
         CreateMap<Booking, BookingResponse>()
             .ForMember(d => d.ClassTypeName, o => o.MapFrom(s => s.ClassSession.ClassType.Name))
@@ -26,5 +29,11 @@ public sealed class MappingProfile : Profile
             .ForMember(d => d.MemberName, o => o.MapFrom(s => s.Member.FullName))
             .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()))
             .ForMember(d => d.WaitlistPosition, o => o.Ignore());
+
+        CreateMap<WaitlistEntry, WaitlistEntryResponse>()
+            .ForMember(d => d.MemberName, o => o.MapFrom(s => s.Member.FullName));
+
+        CreateMap<ClassRating, ClassRatingResponse>()
+            .ForMember(d => d.MemberName, o => o.MapFrom(s => s.Member.FullName));
     }
 }

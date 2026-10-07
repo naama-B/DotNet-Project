@@ -29,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<IClassTypeService, ClassTypeService>();
         services.AddScoped<IClassSessionService, ClassSessionService>();
         services.AddScoped<IBookingService, BookingService>();
+        services.AddScoped<IClassRatingService, ClassRatingService>();
 
         return services;
     }

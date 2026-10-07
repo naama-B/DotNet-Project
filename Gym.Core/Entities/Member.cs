@@ -13,4 +13,5 @@ public class Member
 
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     public ICollection<WaitlistEntry> WaitlistEntries { get; set; } = new List<WaitlistEntry>();
+    public ICollection<ClassRating> Ratings { get; set; } = new List<ClassRating>();
 }

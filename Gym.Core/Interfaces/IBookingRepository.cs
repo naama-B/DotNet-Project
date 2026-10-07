@@ -19,6 +19,9 @@ public interface IBookingRepository : IRepository<Booking>
 
     Task<WaitlistEntry?> GetWaitlistEntryAsync(int classSessionId, int memberId, CancellationToken ct = default);
 
+    /// <summary>Queue position per session for every waitlist entry this member holds.</summary>
+    Task<IReadOnlyDictionary<int, int>> GetWaitlistPositionsForMemberAsync(int memberId, CancellationToken ct = default);
+
     void RemoveWaitlistEntry(WaitlistEntry entry);
 
     Task AddWaitlistEntryAsync(WaitlistEntry entry, CancellationToken ct = default);

@@ -77,9 +77,21 @@ public sealed class DbSeeder
             Status = ClassSessionStatus.Scheduled
         };
 
+        // A session that already took place, so its attendees can leave satisfaction ratings.
+        var pastSpin = new ClassSession
+        {
+            ClassType = spin,
+            Instructor = alex,
+            StartsAtUtc = now.AddDays(-3).Date.AddHours(18),
+            Capacity = 12,
+            BookedCount = 3,
+            Status = ClassSessionStatus.Scheduled
+        };
+
         var sessions = new List<ClassSession>
         {
             raceSession,
+            pastSpin,
             new() { ClassType = spin, Instructor = alex, StartsAtUtc = now.AddDays(2).Date.AddHours(7), Capacity = 12, BookedCount = 0, Status = ClassSessionStatus.Scheduled },
             new() { ClassType = yoga, Instructor = maya, StartsAtUtc = now.AddDays(1).Date.AddHours(9), Capacity = 15, BookedCount = 4, Status = ClassSessionStatus.Scheduled },
             new() { ClassType = yoga, Instructor = maya, StartsAtUtc = now.AddDays(3).Date.AddHours(19), Capacity = 15, BookedCount = 0, Status = ClassSessionStatus.Scheduled },
@@ -89,6 +101,13 @@ public sealed class DbSeeder
         // Two confirmed bookings that back raceSession.BookedCount = 2.
         raceSession.Bookings.Add(new Booking { Member = members[0], Status = BookingStatus.Confirmed, CreatedAtUtc = now });
         raceSession.Bookings.Add(new Booking { Member = members[1], Status = BookingStatus.Confirmed, CreatedAtUtc = now });
+
+        // Three members attended pastSpin; two have already rated it.
+        pastSpin.Bookings.Add(new Booking { Member = members[0], Status = BookingStatus.Confirmed, CreatedAtUtc = now.AddDays(-6) });
+        pastSpin.Bookings.Add(new Booking { Member = members[1], Status = BookingStatus.Confirmed, CreatedAtUtc = now.AddDays(-6) });
+        pastSpin.Bookings.Add(new Booking { Member = members[2], Status = BookingStatus.Confirmed, CreatedAtUtc = now.AddDays(-6) });
+        pastSpin.Ratings.Add(new ClassRating { Member = members[0], Stars = 5, Comment = "Great energy, loved the playlist.", CreatedAtUtc = now.AddDays(-2) });
+        pastSpin.Ratings.Add(new ClassRating { Member = members[1], Stars = 4, CreatedAtUtc = now.AddDays(-2) });
 
         await _db.Members.AddAsync(admin, ct);
         await _db.Members.AddRangeAsync(members, ct);

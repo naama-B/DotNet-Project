@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IClassTypeRepository, ClassTypeRepository>();
         services.AddScoped<IClassSessionRepository, ClassSessionRepository>();
         services.AddScoped<IBookingRepository, BookingRepository>();
+        services.AddScoped<IClassRatingRepository, ClassRatingRepository>();
 
         services.AddScoped<DbSeeder>();
 

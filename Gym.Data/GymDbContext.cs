@@ -14,6 +14,7 @@ public class GymDbContext : DbContext
     public DbSet<ClassSession> ClassSessions => Set<ClassSession>();
     public DbSet<Booking> Bookings => Set<Booking>();
     public DbSet<WaitlistEntry> WaitlistEntries => Set<WaitlistEntry>();
+    public DbSet<ClassRating> ClassRatings => Set<ClassRating>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

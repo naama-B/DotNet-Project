@@ -32,8 +32,16 @@ public sealed class ClassSessionService : IClassSessionService
 
     public async Task<PagedResult<ClassSessionResponse>> ListAsync(ClassSessionQueryParameters parameters, CancellationToken ct = default)
     {
-        var (items, total) = await _sessions.QueryAsync(parameters, ct);
-        var mapped = _mapper.Map<IReadOnlyList<ClassSessionResponse>>(items);
+        var (rows, total) = await _sessions.QueryAsync(parameters, ct);
+
+        var mapped = rows.Select(row =>
+        {
+            var dto = _mapper.Map<ClassSessionResponse>(row.Session);
+            dto.RatingCount = row.RatingCount;
+            dto.AverageStars = row.AverageStars;
+            return dto;
+        }).ToList();
+
         return new PagedResult<ClassSessionResponse>(mapped, parameters.Page, parameters.PageSize, total);
     }
 
@@ -91,5 +99,23 @@ public sealed class ClassSessionService : IClassSessionService
 
         _logger.LogInformation("Class session cancelled: {SessionId}", id);
         return Result.Success();
+    }
+
+    public async Task<Result<SessionWaitlistResponse>> GetWaitlistAsync(int id, CancellationToken ct = default)
+    {
+        var session = await _sessions.GetDetailAsync(id, ct);
+        if (session is null)
+            return Result<SessionWaitlistResponse>.NotFound($"Class session {id} was not found.");
+
+        var entries = await _sessions.GetWaitlistAsync(id, ct);
+
+        return Result<SessionWaitlistResponse>.Success(new SessionWaitlistResponse
+        {
+            ClassSessionId = session.Id,
+            ClassTypeName = session.ClassType.Name,
+            StartsAtUtc = session.StartsAtUtc,
+            Count = entries.Count,
+            Entries = _mapper.Map<IReadOnlyList<WaitlistEntryResponse>>(entries)
+        });
     }
 }

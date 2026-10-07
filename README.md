@@ -171,10 +171,14 @@ other gets `409 Conflict`.
 |-----------------------------------|-------------|--------------------------------------|
 | `POST /api/auth/register`         | anonymous   | Register, returns JWT                |
 | `POST /api/auth/login`            | anonymous   | Login, returns JWT                   |
-| `GET  /api/classsessions`         | any member  | Paged/filterable session list        |
+| `GET  /api/classsessions`         | any member  | Paged/filterable session list (`fromUtc` limits it to upcoming) |
+| `GET  /api/classsessions/reviews` | any member  | Every rated session with its title, instructor and reviews |
 | `GET  /api/classsessions/{id}`    | any member  | One session                          |
 | `POST /api/classsessions`         | Admin       | Create a session                     |
 | `POST /api/classsessions/{id}/cancel` | Admin   | Cancel a session                     |
+| `GET  /api/classsessions/{id}/waitlist` | Admin | The session's waiting list, in queue order |
+| `GET  /api/classsessions/{id}/ratings` | any member | All satisfaction ratings + the average |
+| `POST /api/classsessions/{id}/ratings` | attendee | Leave/update a 1–5 star rating for a past class |
 | `POST /api/bookings`              | any member  | Book a spot (→ 409 on the race)      |
 | `GET  /api/bookings/mine`         | any member  | My bookings                          |
 | `POST /api/bookings/{id}/cancel`  | any member  | Cancel my booking                    |

@@ -44,7 +44,7 @@ public sealed class ClassSessionRepositoryTests : IDisposable
         Assert.Equal(25, total);
         Assert.Equal(10, page2.Count);
         // page 2 starts after the first 10 by start time
-        Assert.True(page2[0].StartsAtUtc < page2[^1].StartsAtUtc);
+        Assert.True(page2[0].Session.StartsAtUtc < page2[^1].Session.StartsAtUtc);
     }
 
     [Fact]
@@ -61,8 +61,8 @@ public sealed class ClassSessionRepositoryTests : IDisposable
         });
 
         Assert.Equal(total, items.Count);
-        Assert.All(items, s => Assert.Equal("Spin", s.ClassType.Name));
-        Assert.All(items, s => Assert.True(s.BookedCount < s.Capacity));
+        Assert.All(items, r => Assert.Equal("Spin", r.Session.ClassType.Name));
+        Assert.All(items, r => Assert.True(r.Session.BookedCount < r.Session.Capacity));
     }
 
     public void Dispose() => _db.Dispose();

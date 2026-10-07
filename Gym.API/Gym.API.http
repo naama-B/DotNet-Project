@@ -43,6 +43,18 @@ Content-Type: application/json
 GET {{host}}/api/bookings/mine
 Authorization: Bearer {{token}}
 
+### Satisfaction ratings for a session (any member) — average + every rating
+GET {{host}}/api/classsessions/1/ratings
+Authorization: Bearer {{token}}
+
+### Leave / update my star rating for a session I attended (1–5 stars)
+### 400 if the session has not happened yet, 403 if I had no confirmed booking.
+POST {{host}}/api/classsessions/1/ratings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "stars": 5, "comment": "Great class!" }
+
 ### Admin login
 # @name admin
 POST {{host}}/api/auth/login
@@ -58,6 +70,10 @@ Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 { "classTypeId": 1, "instructorId": 1, "startsAtUtc": "2026-12-01T18:00:00Z", "capacity": 2 }
+
+### Admin views a session's waiting list (queue order). A member gets 403.
+GET {{host}}/api/classsessions/1/waitlist
+Authorization: Bearer {{adminToken}}
 
 ### A member cannot create a session -> 403
 POST {{host}}/api/classsessions

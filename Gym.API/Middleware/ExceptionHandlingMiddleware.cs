@@ -31,9 +31,16 @@ public sealed class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
-        catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+        catch (OperationCanceledException)
         {
-            _logger.LogInformation("Request {Path} was cancelled by the client.", context.Request.Path);
+            // The client disconnected before the response was sent, or the request timed out.
+            // Normal in development: React StrictMode fires every fetch twice and aborts the first.
+            // Unconditional (no `when` filter) so the debugger sees a real handler and does not
+            // break on it as "user-unhandled".
+            if (context.RequestAborted.IsCancellationRequested)
+                _logger.LogInformation("Request {Path} was cancelled by the client.", context.Request.Path);
+            else
+                _logger.LogInformation("Request {Path} was cancelled.", context.Request.Path);
         }
         catch (Exception ex)
         {

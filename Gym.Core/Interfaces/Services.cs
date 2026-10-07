@@ -31,6 +31,27 @@ public interface IClassSessionService
     Task<Result<ClassSessionResponse>> GetAsync(int id, CancellationToken ct = default);
     Task<Result<ClassSessionResponse>> CreateAsync(CreateClassSessionRequest request, CancellationToken ct = default);
     Task<Result> CancelAsync(int id, CancellationToken ct = default);
+
+    /// <summary>The waiting list for a session, ordered by queue position.</summary>
+    Task<Result<SessionWaitlistResponse>> GetWaitlistAsync(int id, CancellationToken ct = default);
+}
+
+public interface IClassRatingService
+{
+    /// <summary>Every satisfaction rating for a session, with the average.</summary>
+    Task<Result<SessionRatingsResponse>> ListForSessionAsync(int classSessionId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Every session members have rated, each with its title, instructor and the ratings
+    /// themselves (newest first). Sessions with no ratings are omitted.
+    /// </summary>
+    Task<IReadOnlyList<ReviewedSessionResponse>> ListReviewedSessionsAsync(CancellationToken ct = default);
+
+    /// <summary>
+    /// Records (or updates) <paramref name="memberId"/>'s star rating for a session. Only a
+    /// member who held a confirmed booking for a session that has already taken place may rate it.
+    /// </summary>
+    Task<Result<ClassRatingResponse>> RateAsync(int memberId, int classSessionId, CreateClassRatingRequest request, CancellationToken ct = default);
 }
 
 public interface IBookingService

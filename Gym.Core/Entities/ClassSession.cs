@@ -38,6 +38,7 @@ public class ClassSession : IConcurrencyStamped
 
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     public ICollection<WaitlistEntry> WaitlistEntries { get; set; } = new List<WaitlistEntry>();
+    public ICollection<ClassRating> Ratings { get; set; } = new List<ClassRating>();
 
     [NotMapped]
     public int AvailableSpots => Math.Max(0, Capacity - BookedCount);
