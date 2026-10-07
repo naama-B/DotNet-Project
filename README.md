@@ -144,6 +144,38 @@ is needed for `dotnet test`.
 
 ---
 
+## Deploying to Render
+
+The repo root has a `Dockerfile` (multi-stage: SDK build → aspnet runtime) that Render's Docker
+build picks up automatically. It publishes `Gym.API` and listens on whatever port Render injects
+via the `PORT` env var at container start.
+
+1. **Create a PostgreSQL instance** on Render and note its *Internal Database URL* fields
+   (Hostname, Port, Database, User, Password) — the Internal one, since the API runs in the
+   same Render network.
+2. **Create a Web Service** from this repo, environment = **Docker**, root/Dockerfile path =
+   repo root.
+3. Set these environment variables on the Web Service (nested config keys use `__`):
+
+   | Key | Value |
+   |-----|-------|
+   | `ASPNETCORE_ENVIRONMENT` | `Production` |
+   | `ConnectionStrings__Default` | `Host=<hostname>;Port=<port>;Database=<database>;Username=<user>;Password=<password>` |
+   | `Jwt__Key` | a long random secret (not the local dev one) |
+   | `Jwt__Issuer` | `gym-api` |
+   | `Jwt__Audience` | `gym-client` |
+   | `Cors__Origins__0` | the deployed client's origin, e.g. `https://pulse-xyz.onrender.com` |
+
+   (Build the `ConnectionStrings__Default` value from Render's individual Postgres fields —
+   it's the same Npgsql format `dotnet user-secrets` uses locally, not the `postgres://` URL
+   Render also shows.)
+4. Deploy. On boot the app applies EF Core migrations and seeds demo data automatically, same
+   as locally — no manual DB step.
+5. Point the PULSE client at this service by setting its `VITE_API_BASE_URL` build-time env var
+   to `https://<this-service>.onrender.com/api`.
+
+---
+
 ## Demo users
 
 Seeded on first run. Password for every account is shown below.

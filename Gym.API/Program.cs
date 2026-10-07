@@ -6,6 +6,7 @@ using Gym.Data.Seeding;
 using Gym.Service;
 using Gym.Service.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog;
@@ -61,6 +62,14 @@ try
         .WithExposedHeaders(CorrelationIdMiddleware.HeaderName)));
 
     var app = builder.Build();
+
+    // Render (and similar PaaS hosts) terminate TLS at their edge and forward plain HTTP to
+    // the container, tagging the original scheme via X-Forwarded-Proto. Without this, the
+    // HTTPS redirect below can't see that the request already arrived over HTTPS and loops.
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
 
     // --- Pipeline. Order matters: errors first, then correlation id, then auth. ---
     app.UseMiddleware<ExceptionHandlingMiddleware>();
