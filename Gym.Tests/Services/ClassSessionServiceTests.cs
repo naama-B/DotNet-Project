@@ -46,6 +46,44 @@ public sealed class ClassSessionServiceTests
     }
 
     [Fact]
+    public async Task GetParticipantsAsync_returns_confirmed_members_with_capacity()
+    {
+        var session = new ClassSession
+        {
+            Id = 1,
+            Capacity = 3,
+            StartsAtUtc = DateTime.UtcNow.AddDays(1),
+            ClassType = new ClassType { Id = 1, Name = "Spin", DurationMinutes = 45 }
+        };
+        _sessions.Setup(r => r.GetDetailAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(session);
+        _sessions.Setup(r => r.GetParticipantsAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Booking>
+            {
+                new() { Id = 10, MemberId = 7, Member = new Member { Id = 7, FullName = "Dana", Email = "dana@gym.local" }, CreatedAtUtc = DateTime.UtcNow },
+                new() { Id = 11, MemberId = 8, Member = new Member { Id = 8, FullName = "Noa", Email = "noa@gym.local" }, CreatedAtUtc = DateTime.UtcNow },
+            });
+
+        var result = await CreateSut().GetParticipantsAsync(1);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(3, result.Value!.Capacity);
+        Assert.Equal(2, result.Value.Count);
+        Assert.Collection(result.Value.Participants,
+            p => { Assert.Equal(10, p.BookingId); Assert.Equal("Dana", p.MemberName); Assert.Equal("dana@gym.local", p.Email); },
+            p => Assert.Equal("Noa", p.MemberName));
+    }
+
+    [Fact]
+    public async Task GetParticipantsAsync_returns_NotFound_for_an_unknown_session()
+    {
+        _sessions.Setup(r => r.GetDetailAsync(99, It.IsAny<CancellationToken>())).ReturnsAsync((ClassSession?)null);
+
+        var result = await CreateSut().GetParticipantsAsync(99);
+
+        Assert.Equal(ResultStatus.NotFound, result.Status);
+    }
+
+    [Fact]
     public async Task GetWaitlistAsync_returns_NotFound_for_an_unknown_session()
     {
         _sessions.Setup(r => r.GetDetailAsync(99, It.IsAny<CancellationToken>())).ReturnsAsync((ClassSession?)null);

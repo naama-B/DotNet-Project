@@ -34,6 +34,9 @@ public interface IClassSessionService
 
     /// <summary>The waiting list for a session, ordered by queue position.</summary>
     Task<Result<SessionWaitlistResponse>> GetWaitlistAsync(int id, CancellationToken ct = default);
+
+    /// <summary>The members holding a confirmed spot in a session, in booking order.</summary>
+    Task<Result<SessionParticipantsResponse>> GetParticipantsAsync(int id, CancellationToken ct = default);
 }
 
 public interface IClassRatingService

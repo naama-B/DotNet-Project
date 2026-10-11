@@ -30,6 +30,12 @@ public sealed class MappingProfile : Profile
             .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()))
             .ForMember(d => d.WaitlistPosition, o => o.Ignore());
 
+        CreateMap<Booking, ParticipantResponse>()
+            .ForMember(d => d.BookingId, o => o.MapFrom(s => s.Id))
+            .ForMember(d => d.MemberName, o => o.MapFrom(s => s.Member.FullName))
+            .ForMember(d => d.Email, o => o.MapFrom(s => s.Member.Email))
+            .ForMember(d => d.BookedAtUtc, o => o.MapFrom(s => s.CreatedAtUtc));
+
         CreateMap<WaitlistEntry, WaitlistEntryResponse>()
             .ForMember(d => d.MemberName, o => o.MapFrom(s => s.Member.FullName));
 

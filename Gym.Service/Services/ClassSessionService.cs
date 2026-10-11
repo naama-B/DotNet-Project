@@ -118,4 +118,23 @@ public sealed class ClassSessionService : IClassSessionService
             Entries = _mapper.Map<IReadOnlyList<WaitlistEntryResponse>>(entries)
         });
     }
+
+    public async Task<Result<SessionParticipantsResponse>> GetParticipantsAsync(int id, CancellationToken ct = default)
+    {
+        var session = await _sessions.GetDetailAsync(id, ct);
+        if (session is null)
+            return Result<SessionParticipantsResponse>.NotFound($"Class session {id} was not found.");
+
+        var bookings = await _sessions.GetParticipantsAsync(id, ct);
+
+        return Result<SessionParticipantsResponse>.Success(new SessionParticipantsResponse
+        {
+            ClassSessionId = session.Id,
+            ClassTypeName = session.ClassType.Name,
+            StartsAtUtc = session.StartsAtUtc,
+            Capacity = session.Capacity,
+            Count = bookings.Count,
+            Participants = _mapper.Map<IReadOnlyList<ParticipantResponse>>(bookings)
+        });
+    }
 }

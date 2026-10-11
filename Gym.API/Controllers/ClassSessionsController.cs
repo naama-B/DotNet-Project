@@ -62,6 +62,17 @@ public sealed class ClassSessionsController : ApiControllerBase
         ToResponse(await _service.GetWaitlistAsync(id, ct), Ok);
 
     /// <summary>
+    /// The members holding a confirmed spot in a session, in booking order. Admin only — it
+    /// exposes other members' names and emails.
+    /// </summary>
+    [HttpGet("{id:int}/participants")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(SessionParticipantsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Participants([FromRoute] int id, CancellationToken ct) =>
+        ToResponse(await _service.GetParticipantsAsync(id, ct), Ok);
+
+    /// <summary>
     /// Every session that members have rated — its title, instructor and the reviews themselves.
     /// Backs the standalone reviews page.
     /// </summary>

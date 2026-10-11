@@ -91,6 +91,14 @@ public sealed class ClassSessionRepository : Repository<ClassSession>, IClassSes
             .OrderBy(w => w.Position)
             .ToListAsync(ct);
 
+    public async Task<IReadOnlyList<Booking>> GetParticipantsAsync(int classSessionId, CancellationToken ct = default) =>
+        await Db.Bookings
+            .AsNoTracking()
+            .Include(b => b.Member)
+            .Where(b => b.ClassSessionId == classSessionId && b.Status == BookingStatus.Confirmed)
+            .OrderBy(b => b.CreatedAtUtc)
+            .ToListAsync(ct);
+
     public async Task<IReadOnlyList<ClassSession>> ListRatedAsync(CancellationToken ct = default) =>
         await Set.AsNoTracking()
             .Include(s => s.ClassType)

@@ -27,6 +27,9 @@ public interface IClassSessionRepository : IRepository<ClassSession>
     /// <summary>The session's waiting list, member loaded, ordered by queue position (read-only).</summary>
     Task<IReadOnlyList<WaitlistEntry>> GetWaitlistAsync(int classSessionId, CancellationToken ct = default);
 
+    /// <summary>The session's confirmed bookings, member loaded, in booking order (read-only).</summary>
+    Task<IReadOnlyList<Booking>> GetParticipantsAsync(int classSessionId, CancellationToken ct = default);
+
     /// <summary>
     /// Every session that has at least one rating, with its class type, instructor and ratings
     /// (each rating's member loaded), most recently held first (read-only).
