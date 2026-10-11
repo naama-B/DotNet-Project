@@ -11,7 +11,7 @@ The server is the graded deliverable. A React client will be added later.
 
 ## The limited resource and how contention is handled
 
-**The limited resource is a `ClassSession`** — one scheduled run of a class (e.g. "Spin,
+**The limited resource is a `ClassSession`** — one scheduled run of a class (e.g. "Pilates,
 Tuesday 18:00") with a fixed `Capacity`. Every confirmed booking consumes one of a small,
 countable number of spots.
 
@@ -190,7 +190,7 @@ Seeded on first run. Password for every account is shown below.
 
 ### Trying the booking race by hand
 
-The seed creates a **Spin** session tomorrow at 18:00 with **capacity 3 and 2 already
+The seed creates a **Classic Aerobics** session tomorrow at 18:00 with **capacity 3 and 2 already
 booked** — exactly one spot left. Log in as two different members, and fire
 `POST /api/bookings` with that session's id from both at the same time: one gets `201`, the
 other gets `409 Conflict`.
@@ -217,5 +217,5 @@ other gets `409 Conflict`.
 | `GET/POST/PUT/DELETE /api/classtypes` | GET any / writes Admin | Class-type catalogue     |
 | `GET/POST /api/instructors`       | GET any / POST Admin | Instructors                 |
 
-Pagination is real: `?page=2&pageSize=10&search=spin&onlyAvailable=true` translates to
+Pagination is real: `?page=2&pageSize=10&search=pilates&onlyAvailable=true` translates to
 `Skip`/`Take` in the SQL query, not in memory.

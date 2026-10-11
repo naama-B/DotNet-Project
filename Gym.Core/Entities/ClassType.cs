@@ -1,6 +1,6 @@
 namespace Gym.Core.Entities;
 
-/// <summary>A kind of class offered by the gym (e.g. "Spin", "Yoga"). One-to-many with <see cref="ClassSession"/>.</summary>
+/// <summary>A kind of class offered by the gym (e.g. "Classic Aerobics", "Pilates"). One-to-many with <see cref="ClassSession"/>.</summary>
 public class ClassType
 {
     public int Id { get; set; }

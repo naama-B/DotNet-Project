@@ -58,18 +58,19 @@ public sealed class DbSeeder
         var strength = new Tag { Name = "Strength" };
         var beginner = new Tag { Name = "Beginner" };
         var mind = new Tag { Name = "Mind & Body" };
+        var dance = new Tag { Name = "Dance" };
 
-        var spin = new ClassType { Name = "Spin", Description = "Indoor cycling.", DurationMinutes = 45, DefaultCapacity = 12, Tags = { cardio, beginner } };
-        var yoga = new ClassType { Name = "Yoga Flow", Description = "Vinyasa yoga.", DurationMinutes = 60, DefaultCapacity = 15, Tags = { mind, beginner } };
-        var hiit = new ClassType { Name = "HIIT", Description = "High intensity intervals.", DurationMinutes = 30, DefaultCapacity = 10, Tags = { cardio, strength } };
+        var aerobics = new ClassType { Name = "Classic Aerobics", Description = "High-energy step and floor aerobics to music.", DurationMinutes = 45, DefaultCapacity = 12, Tags = { cardio, beginner } };
+        var pilates = new ClassType { Name = "Pilates", Description = "Mat Pilates for core strength and posture.", DurationMinutes = 60, DefaultCapacity = 15, Tags = { mind, strength } };
+        var hipHop = new ClassType { Name = "Hip-hop", Description = "Hip-hop dance choreography, all levels.", DurationMinutes = 45, DefaultCapacity = 10, Tags = { dance, cardio } };
 
-        var alex = new Instructor { FullName = "Alex Bar", Bio = "Certified cycling and HIIT coach." };
-        var maya = new Instructor { FullName = "Maya Gold", Bio = "Yoga teacher, 500h RYT." };
+        var alex = new Instructor { FullName = "Alex Bar", Bio = "Certified aerobics and hip-hop dance instructor." };
+        var maya = new Instructor { FullName = "Maya Gold", Bio = "Certified Pilates instructor." };
 
         // A near-full session: capacity 3, already 2 confirmed -> exactly one spot left.
         var raceSession = new ClassSession
         {
-            ClassType = spin,
+            ClassType = aerobics,
             Instructor = alex,
             StartsAtUtc = now.AddDays(1).Date.AddHours(18),
             Capacity = 3,
@@ -78,9 +79,9 @@ public sealed class DbSeeder
         };
 
         // A session that already took place, so its attendees can leave satisfaction ratings.
-        var pastSpin = new ClassSession
+        var pastAerobics = new ClassSession
         {
-            ClassType = spin,
+            ClassType = aerobics,
             Instructor = alex,
             StartsAtUtc = now.AddDays(-3).Date.AddHours(18),
             Capacity = 12,
@@ -91,28 +92,28 @@ public sealed class DbSeeder
         var sessions = new List<ClassSession>
         {
             raceSession,
-            pastSpin,
-            new() { ClassType = spin, Instructor = alex, StartsAtUtc = now.AddDays(2).Date.AddHours(7), Capacity = 12, BookedCount = 0, Status = ClassSessionStatus.Scheduled },
-            new() { ClassType = yoga, Instructor = maya, StartsAtUtc = now.AddDays(1).Date.AddHours(9), Capacity = 15, BookedCount = 4, Status = ClassSessionStatus.Scheduled },
-            new() { ClassType = yoga, Instructor = maya, StartsAtUtc = now.AddDays(3).Date.AddHours(19), Capacity = 15, BookedCount = 0, Status = ClassSessionStatus.Scheduled },
-            new() { ClassType = hiit, Instructor = alex, StartsAtUtc = now.AddDays(2).Date.AddHours(17), Capacity = 10, BookedCount = 9, Status = ClassSessionStatus.Scheduled }
+            pastAerobics,
+            new() { ClassType = aerobics, Instructor = alex, StartsAtUtc = now.AddDays(2).Date.AddHours(7), Capacity = 12, BookedCount = 0, Status = ClassSessionStatus.Scheduled },
+            new() { ClassType = pilates, Instructor = maya, StartsAtUtc = now.AddDays(1).Date.AddHours(9), Capacity = 15, BookedCount = 4, Status = ClassSessionStatus.Scheduled },
+            new() { ClassType = pilates, Instructor = maya, StartsAtUtc = now.AddDays(3).Date.AddHours(19), Capacity = 15, BookedCount = 0, Status = ClassSessionStatus.Scheduled },
+            new() { ClassType = hipHop, Instructor = alex, StartsAtUtc = now.AddDays(2).Date.AddHours(17), Capacity = 10, BookedCount = 9, Status = ClassSessionStatus.Scheduled }
         };
 
         // Two confirmed bookings that back raceSession.BookedCount = 2.
         raceSession.Bookings.Add(new Booking { Member = members[0], Status = BookingStatus.Confirmed, CreatedAtUtc = now });
         raceSession.Bookings.Add(new Booking { Member = members[1], Status = BookingStatus.Confirmed, CreatedAtUtc = now });
 
-        // Three members attended pastSpin; two have already rated it.
-        pastSpin.Bookings.Add(new Booking { Member = members[0], Status = BookingStatus.Confirmed, CreatedAtUtc = now.AddDays(-6) });
-        pastSpin.Bookings.Add(new Booking { Member = members[1], Status = BookingStatus.Confirmed, CreatedAtUtc = now.AddDays(-6) });
-        pastSpin.Bookings.Add(new Booking { Member = members[2], Status = BookingStatus.Confirmed, CreatedAtUtc = now.AddDays(-6) });
-        pastSpin.Ratings.Add(new ClassRating { Member = members[0], Stars = 5, Comment = "Great energy, loved the playlist.", CreatedAtUtc = now.AddDays(-2) });
-        pastSpin.Ratings.Add(new ClassRating { Member = members[1], Stars = 4, CreatedAtUtc = now.AddDays(-2) });
+        // Three members attended pastAerobics; two have already rated it.
+        pastAerobics.Bookings.Add(new Booking { Member = members[0], Status = BookingStatus.Confirmed, CreatedAtUtc = now.AddDays(-6) });
+        pastAerobics.Bookings.Add(new Booking { Member = members[1], Status = BookingStatus.Confirmed, CreatedAtUtc = now.AddDays(-6) });
+        pastAerobics.Bookings.Add(new Booking { Member = members[2], Status = BookingStatus.Confirmed, CreatedAtUtc = now.AddDays(-6) });
+        pastAerobics.Ratings.Add(new ClassRating { Member = members[0], Stars = 5, Comment = "Great energy, loved the playlist.", CreatedAtUtc = now.AddDays(-2) });
+        pastAerobics.Ratings.Add(new ClassRating { Member = members[1], Stars = 4, CreatedAtUtc = now.AddDays(-2) });
 
         await _db.Members.AddAsync(admin, ct);
         await _db.Members.AddRangeAsync(members, ct);
         await _db.Instructors.AddRangeAsync(alex, maya);
-        await _db.ClassTypes.AddRangeAsync(spin, yoga, hiit);
+        await _db.ClassTypes.AddRangeAsync(aerobics, pilates, hipHop);
         await _db.ClassSessions.AddRangeAsync(sessions, ct);
 
         await _db.SaveChangesAsync(ct);

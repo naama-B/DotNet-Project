@@ -23,7 +23,7 @@ Content-Type: application/json
 GET {{host}}/api/classsessions?page=1&pageSize=10&onlyAvailable=true&sortBy=startsAt
 Authorization: Bearer {{token}}
 
-### The seeded near-full Spin session is id 1 (capacity 3, 2 booked).
+### The seeded near-full Classic Aerobics session is id 1 (capacity 3, 2 booked).
 ### Fire the next two requests as close together as possible:
 ### one returns 201, the other 409 Conflict.
 POST {{host}}/api/bookings
