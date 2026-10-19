@@ -62,8 +62,12 @@ public sealed class ClassSessionService : IClassSessionService
         if (!classType.IsActive)
             return Result<ClassSessionResponse>.Validation($"Class type '{classType.Name}' is inactive; new sessions cannot be scheduled for it.");
 
-        if (await _instructors.GetByIdAsync(request.InstructorId, ct) is null)
+        var instructor = await _instructors.GetByIdAsync(request.InstructorId, ct);
+        if (instructor is null)
             return Result<ClassSessionResponse>.Validation($"Instructor {request.InstructorId} does not exist.");
+
+        if (!instructor.IsActive)
+            return Result<ClassSessionResponse>.Validation($"Instructor '{instructor.FullName}' is inactive; new sessions cannot be scheduled with them.");
 
         var startsAt = DateTime.SpecifyKind(request.StartsAtUtc, DateTimeKind.Utc);
         if (startsAt <= DateTime.UtcNow)

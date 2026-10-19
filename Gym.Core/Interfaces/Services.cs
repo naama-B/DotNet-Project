@@ -22,8 +22,10 @@ public interface IClassTypeService
 
 public interface IInstructorService
 {
-    Task<IReadOnlyList<InstructorResponse>> ListAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<InstructorResponse>> ListAsync(bool includeInactive = false, CancellationToken ct = default);
     Task<Result<InstructorResponse>> CreateAsync(CreateInstructorRequest request, CancellationToken ct = default);
+    Task<Result> DeactivateAsync(int id, CancellationToken ct = default);
+    Task<Result> ActivateAsync(int id, CancellationToken ct = default);
 }
 
 public interface IClassSessionService

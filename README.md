@@ -217,7 +217,9 @@ other gets `409 Conflict`.
 | `GET/POST/PUT /api/classtypes`    | GET any / writes Admin | Class-type catalogue (`?includeInactive=true` for Admin) |
 | `POST /api/classtypes/{id}/deactivate` | Admin   | Retire a class type (409 while it has upcoming sessions) |
 | `POST /api/classtypes/{id}/activate` | Admin     | Bring a deactivated class type back  |
-| `GET/POST /api/instructors`       | GET any / POST Admin | Instructors                 |
+| `GET/POST /api/instructors`       | GET any / POST Admin | Instructors (`?includeInactive=true` for Admin) |
+| `POST /api/instructors/{id}/deactivate` | Admin  | Retire an instructor (409 while they have upcoming sessions) |
+| `POST /api/instructors/{id}/activate` | Admin    | Bring a deactivated instructor back  |
 
 Pagination is real: `?page=2&pageSize=10&search=pilates&onlyAvailable=true` translates to
 `Skip`/`Take` in the SQL query, not in memory.

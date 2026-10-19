@@ -7,6 +7,7 @@ public sealed class InstructorResponse
     public int Id { get; set; }
     public string FullName { get; set; } = default!;
     public string? Bio { get; set; }
+    public bool IsActive { get; set; }
 }
 
 public sealed class CreateInstructorRequest

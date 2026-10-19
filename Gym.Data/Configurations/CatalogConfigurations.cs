@@ -11,6 +11,7 @@ public sealed class InstructorConfiguration : IEntityTypeConfiguration<Instructo
         builder.HasKey(i => i.Id);
         builder.Property(i => i.FullName).IsRequired().HasMaxLength(120);
         builder.Property(i => i.Bio).HasMaxLength(1000);
+        builder.Property(i => i.IsActive).HasDefaultValue(true);
     }
 }
 
