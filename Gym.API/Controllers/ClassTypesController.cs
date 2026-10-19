@@ -13,10 +13,14 @@ public sealed class ClassTypesController : ApiControllerBase
 
     public ClassTypesController(IClassTypeService service) => _service = service;
 
+    /// <summary>
+    /// Active class types. Admins can pass <c>includeInactive=true</c> to also see deactivated ones.
+    /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyList<ClassTypeResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IReadOnlyList<ClassTypeResponse>>> List(CancellationToken ct) =>
-        Ok(await _service.ListAsync(ct));
+    public async Task<ActionResult<IReadOnlyList<ClassTypeResponse>>> List(
+        [FromQuery] bool includeInactive, CancellationToken ct) =>
+        Ok(await _service.ListAsync(includeInactive && User.IsInRole("Admin"), ct));
 
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(ClassTypeResponse), StatusCodes.Status200OK)]
@@ -43,11 +47,24 @@ public sealed class ClassTypesController : ApiControllerBase
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateClassTypeRequest request, CancellationToken ct) =>
         ToResponse(await _service.UpdateAsync(id, request, ct), Ok);
 
-    [HttpDelete("{id:int}")]
+    /// <summary>
+    /// Deactivates a class type: it disappears from the regular list and no new sessions can be
+    /// scheduled for it. Past sessions, bookings and ratings are kept. Refused while the type
+    /// still has upcoming sessions that were not cancelled.
+    /// </summary>
+    [HttpPost("{id:int}/deactivate")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken ct) =>
-        ToResponse(await _service.DeleteAsync(id, ct));
+    public async Task<IActionResult> Deactivate([FromRoute] int id, CancellationToken ct) =>
+        ToResponse(await _service.DeactivateAsync(id, ct));
+
+    /// <summary>Reactivates a previously deactivated class type.</summary>
+    [HttpPost("{id:int}/activate")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Activate([FromRoute] int id, CancellationToken ct) =>
+        ToResponse(await _service.ActivateAsync(id, ct));
 }

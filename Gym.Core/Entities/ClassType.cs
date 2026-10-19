@@ -11,6 +11,12 @@ public class ClassType
     /// <summary>Capacity applied to a new session unless the caller overrides it.</summary>
     public int DefaultCapacity { get; set; }
 
+    /// <summary>
+    /// False once an admin has deactivated the class type. Inactive types keep their past
+    /// sessions, bookings and ratings, but no new sessions can be scheduled for them.
+    /// </summary>
+    public bool IsActive { get; set; } = true;
+
     public ICollection<ClassSession> Sessions { get; set; } = new List<ClassSession>();
     public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 }

@@ -214,7 +214,9 @@ other gets `409 Conflict`.
 | `POST /api/bookings`              | any member  | Book a spot (→ 409 on the race)      |
 | `GET  /api/bookings/mine`         | any member  | My bookings                          |
 | `POST /api/bookings/{id}/cancel`  | any member  | Cancel my booking                    |
-| `GET/POST/PUT/DELETE /api/classtypes` | GET any / writes Admin | Class-type catalogue     |
+| `GET/POST/PUT /api/classtypes`    | GET any / writes Admin | Class-type catalogue (`?includeInactive=true` for Admin) |
+| `POST /api/classtypes/{id}/deactivate` | Admin   | Retire a class type (409 while it has upcoming sessions) |
+| `POST /api/classtypes/{id}/activate` | Admin     | Bring a deactivated class type back  |
 | `GET/POST /api/instructors`       | GET any / POST Admin | Instructors                 |
 
 Pagination is real: `?page=2&pageSize=10&search=pilates&onlyAvailable=true` translates to

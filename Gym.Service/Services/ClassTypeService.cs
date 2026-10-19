@@ -20,9 +20,9 @@ public sealed class ClassTypeService : IClassTypeService
         _logger = logger;
     }
 
-    public async Task<IReadOnlyList<ClassTypeResponse>> ListAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<ClassTypeResponse>> ListAsync(bool includeInactive = false, CancellationToken ct = default)
     {
-        var items = await _classTypes.ListWithTagsAsync(ct);
+        var items = await _classTypes.ListWithTagsAsync(includeInactive, ct);
         return _mapper.Map<IReadOnlyList<ClassTypeResponse>>(items);
     }
 
@@ -80,24 +80,38 @@ public sealed class ClassTypeService : IClassTypeService
         return Result<ClassTypeResponse>.Success(_mapper.Map<ClassTypeResponse>(entity));
     }
 
-    public async Task<Result> DeleteAsync(int id, CancellationToken ct = default)
+    public async Task<Result> DeactivateAsync(int id, CancellationToken ct = default)
     {
         var entity = await _classTypes.GetByIdAsync(id, ct);
         if (entity is null)
             return Result.NotFound($"Class type {id} was not found.");
 
-        try
-        {
-            _classTypes.Remove(entity);
-            await _classTypes.SaveChangesAsync(ct);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            // FK restrict: sessions still reference this class type.
-            _logger.LogWarning(ex, "Blocked delete of class type {ClassTypeId} with existing sessions", id);
-            return Result.Conflict("This class type still has scheduled sessions and cannot be deleted.");
-        }
+        if (!entity.IsActive)
+            return Result.Success();
 
+        if (await _classTypes.HasUpcomingSessionsAsync(id, DateTime.UtcNow, ct))
+            return Result.Conflict("This class type still has upcoming sessions. Cancel them before deactivating it.");
+
+        entity.IsActive = false;
+        await _classTypes.SaveChangesAsync(ct);
+
+        _logger.LogInformation("Class type deactivated: {ClassTypeId}", id);
+        return Result.Success();
+    }
+
+    public async Task<Result> ActivateAsync(int id, CancellationToken ct = default)
+    {
+        var entity = await _classTypes.GetByIdAsync(id, ct);
+        if (entity is null)
+            return Result.NotFound($"Class type {id} was not found.");
+
+        if (entity.IsActive)
+            return Result.Success();
+
+        entity.IsActive = true;
+        await _classTypes.SaveChangesAsync(ct);
+
+        _logger.LogInformation("Class type reactivated: {ClassTypeId}", id);
         return Result.Success();
     }
 }

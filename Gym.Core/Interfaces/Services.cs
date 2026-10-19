@@ -12,11 +12,12 @@ public interface IAuthService
 
 public interface IClassTypeService
 {
-    Task<IReadOnlyList<ClassTypeResponse>> ListAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<ClassTypeResponse>> ListAsync(bool includeInactive = false, CancellationToken ct = default);
     Task<Result<ClassTypeResponse>> GetAsync(int id, CancellationToken ct = default);
     Task<Result<ClassTypeResponse>> CreateAsync(CreateClassTypeRequest request, CancellationToken ct = default);
     Task<Result<ClassTypeResponse>> UpdateAsync(int id, UpdateClassTypeRequest request, CancellationToken ct = default);
-    Task<Result> DeleteAsync(int id, CancellationToken ct = default);
+    Task<Result> DeactivateAsync(int id, CancellationToken ct = default);
+    Task<Result> ActivateAsync(int id, CancellationToken ct = default);
 }
 
 public interface IInstructorService

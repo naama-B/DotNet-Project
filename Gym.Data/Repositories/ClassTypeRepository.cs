@@ -1,4 +1,5 @@
 using Gym.Core.Entities;
+using Gym.Core.Enums;
 using Gym.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,11 +12,18 @@ public sealed class ClassTypeRepository : Repository<ClassType>, IClassTypeRepos
     public Task<ClassType?> GetWithTagsAsync(int id, CancellationToken ct = default) =>
         Set.Include(ct2 => ct2.Tags).FirstOrDefaultAsync(ct2 => ct2.Id == id, ct);
 
-    public async Task<IReadOnlyList<ClassType>> ListWithTagsAsync(CancellationToken ct = default) =>
+    public async Task<IReadOnlyList<ClassType>> ListWithTagsAsync(bool includeInactive, CancellationToken ct = default) =>
         await Set.AsNoTracking()
+            .Where(c => includeInactive || c.IsActive)
             .Include(c => c.Tags)
             .OrderBy(c => c.Name)
             .ToListAsync(ct);
+
+    public Task<bool> HasUpcomingSessionsAsync(int id, DateTime nowUtc, CancellationToken ct = default) =>
+        Db.ClassSessions.AnyAsync(s =>
+            s.ClassTypeId == id &&
+            s.Status == ClassSessionStatus.Scheduled &&
+            s.StartsAtUtc > nowUtc, ct);
 
     public Task<bool> NameExistsAsync(string name, int? excludeId = null, CancellationToken ct = default) =>
         Set.AnyAsync(c => c.Name == name && (excludeId == null || c.Id != excludeId), ct);

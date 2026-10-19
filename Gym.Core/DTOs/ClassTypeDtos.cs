@@ -9,6 +9,7 @@ public sealed class ClassTypeResponse
     public string? Description { get; set; }
     public int DurationMinutes { get; set; }
     public int DefaultCapacity { get; set; }
+    public bool IsActive { get; set; }
     public IReadOnlyList<string> Tags { get; set; } = Array.Empty<string>();
 }
 

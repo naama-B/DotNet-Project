@@ -32,6 +32,7 @@ public sealed class ClassTypeConfiguration : IEntityTypeConfiguration<ClassType>
         builder.Property(ct => ct.Name).IsRequired().HasMaxLength(80);
         builder.Property(ct => ct.Description).HasMaxLength(500);
         builder.HasIndex(ct => ct.Name).IsUnique();
+        builder.Property(ct => ct.IsActive).HasDefaultValue(true);
 
         // one-to-many: a class type has many scheduled sessions
         builder.HasMany(ct => ct.Sessions)
